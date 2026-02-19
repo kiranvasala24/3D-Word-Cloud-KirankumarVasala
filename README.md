@@ -1,6 +1,6 @@
 # 3D Word Cloud
 
-An interactive website that visualizes topics from a news article as a 3D word cloud.
+An interactive way to visualize and explore the key topics from any article as a dynamic 3D word cloud.
 
 ## Stack
 

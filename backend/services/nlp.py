@@ -1,22 +1,22 @@
 import re
+import logging
 import nltk
 from sklearn.feature_extraction.text import TfidfVectorizer
-import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("3DCloud.Analyzer")
 
 def setup_nltk():
     for pkg in ["stopwords", "punkt", "punkt_tab"]:
         try:
             nltk.download(pkg, quiet=True)
-        except:
-            pass
+        except Exception as e:
+            logger.warning(f"NLTK download skipped for {pkg}: {e}")
 
 setup_nltk()
 
 from nltk.corpus import stopwords
-
 STOP_WORDS = set(stopwords.words("english"))
+
 EXTRA_STOP_WORDS = {
     "said", "says", "also", "would", "could", "one", "two", "three",
     "new", "like", "get", "make", "us", "year", "years", "time",
@@ -24,6 +24,7 @@ EXTRA_STOP_WORDS = {
     "many", "much", "still", "well", "back", "first", "last", "since",
     "may", "today", "yesterday", "going", "take", "know", "see"
 }
+
 ALL_STOP_WORDS = STOP_WORDS.union(EXTRA_STOP_WORDS)
 
 def clean_text(text: str) -> str:
@@ -43,7 +44,6 @@ def extract_keywords(text: str, top_n: int = 60) -> list[dict]:
             stop_words=list(ALL_STOP_WORDS),
             ngram_range=(1, 2),
             max_features=250,
-            min_df=1,
             token_pattern=r'(?u)\b[a-z]{3,}\b'
         )
         
@@ -51,23 +51,20 @@ def extract_keywords(text: str, top_n: int = 60) -> list[dict]:
         feature_names = vectorizer.get_feature_names_out()
         scores = tfidf_matrix.toarray()[0]
         
-        word_scores = []
-        for i in range(len(feature_names)):
-            if scores[i] > 0:
-                word_scores.append({
-                    "word": feature_names[i],
-                    "weight": float(scores[i])
-                })
+        word_scores = [
+            {"word": feature_names[i], "weight": float(scores[i])}
+            for i in range(len(feature_names)) if scores[i] > 0
+        ]
         
         word_scores.sort(key=lambda x: x["weight"], reverse=True)
         top_words = word_scores[:top_n]
         
         if top_words:
-            max_weight = top_words[0]["weight"]
+            max_w = top_words[0]["weight"]
             for item in top_words:
-                item["weight"] = round(item["weight"] / max_weight, 4)
+                item["weight"] = round(item["weight"] / max_w, 4)
             
         return top_words
     except Exception as e:
-        logger.error(f"NLP error: {e}")
+        logger.error(f"Analysis failed: {e}")
         return []

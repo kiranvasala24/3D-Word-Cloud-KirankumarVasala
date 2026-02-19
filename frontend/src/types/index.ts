@@ -3,9 +3,10 @@ export interface WordData {
     weight: number;
 }
 
-export interface AnalyzeResponse{
-    words : WordData[];
-    article_url : string;
+export interface AnalyzeResponse {
+    words: WordData[];
+    article_url: string;
+    title: string;
 }
 
 export type AppState = "idle" | "loading" | "success" | "error";

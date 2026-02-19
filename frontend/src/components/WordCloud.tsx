@@ -6,7 +6,7 @@ import { WordData } from "../types";
 import WordSphere from "./WordSphere";
 
 interface WordCloudProps {
-    words : WordData[];
+    words: WordData[];
 }
 
 const PALETTE = [
@@ -16,7 +16,7 @@ const PALETTE = [
 ];
 
 function fibonacciSphere(count: number, radius: number): [number, number, number][] {
-    const positions : [number, number, number] [] = [];
+    const positions: [number, number, number][] = [];
     const goldenAngle = Math.PI * (3 - Math.sqrt(5));
 
     for (let i = 0; i < count; i++) {
@@ -32,21 +32,22 @@ function fibonacciSphere(count: number, radius: number): [number, number, number
     return positions;
 }
 
-export default function WordCloud ({ words} : WordCloudProps) {
+export default function WordCloud({ words }: WordCloudProps) {
     const groupRef = useRef<THREE.Group>(null);
 
     const radius = useMemo(() => {
-        const base =  3.5;
+        const base = 3.5;
         const scale = Math.sqrt(words.length / 30);
         return base + scale * 1.2;
-    },
-    [words.length]
+    }, [words.length]);
+
+    const positions = useMemo(() =>
+        fibonacciSphere(words.length, radius),
+        [words.length, radius]
     );
 
-    const positions = useMemo(() => fibonacciSphere(words.length, radius), [words.length, radius]);
-
-    const colors = useMemo(
-        () => words.map((_, i) => PALETTE[i % PALETTE.length]),
+    const colors = useMemo(() =>
+        words.map((_, i) => PALETTE[i % PALETTE.length]),
         [words]
     );
 
@@ -55,22 +56,25 @@ export default function WordCloud ({ words} : WordCloudProps) {
             groupRef.current.rotation.y += delta * 0.08;
         }
     });
+
     return (
-         <>
-      <OrbitControls enableZoom enablePan={false} autoRotate={false} />
-      <ambientLight intensity={0.6} />
-      <pointLight position={[10, 10, 10]} intensity={1} />
-      <group ref={groupRef}>
-        {words.map((w, i) => (
-          <WordSphere
-            key={w.word}
-            word={w}
-            position={positions[i]}
-            color={colors[i]}
-          />
-        ))}
-      </group>
-    </>
-  );
+        <>
+            <OrbitControls enableZoom enablePan={false} autoRotate={false} />
+            <ambientLight intensity={0.6} />
+            <pointLight position={[10, 10, 10]} intensity={1} />
+
+            <group ref={groupRef}>
+                {words.map((w, i) => (
+                    <WordSphere
+                        key={w.word}
+                        word={w}
+                        position={positions[i]}
+                        color={colors[i]}
+                    />
+                ))}
+            </group>
+        </>
+    );
 }
+
 

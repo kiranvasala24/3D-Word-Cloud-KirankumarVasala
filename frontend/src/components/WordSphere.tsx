@@ -5,12 +5,12 @@ import * as THREE from "three";
 import { WordData } from "../types";
 
 interface WordSphereProps {
-    word : WordData;
-    position : [number, number, number];
-    color : string;
+    word: WordData;
+    position: [number, number, number];
+    color: string;
 }
 
-export default function WordSphere({word, position, color }: WordSphereProps) {
+export default function WordSphere({ word, position, color }: WordSphereProps) {
     const ref = useRef<THREE.Group>(null);
     const [hovered, setHovered] = useState(false);
 
@@ -20,20 +20,29 @@ export default function WordSphere({word, position, color }: WordSphereProps) {
     useFrame((state) => {
         if (!ref.current) return;
         const t = state.clock.elapsedTime;
-        ref.current.position.y = position[1] + Math.sin(t* 0.4 + position[0]) * 0.06;
-        ref.current.scale.setScalar(hovered ? 1.25 : 1.0);
+
+        ref.current.position.y = position[1] + Math.sin(t * 0.4 + position[0]) * 0.08;
+
+        const pulse = 1 + Math.sin(t * 1.5) * (word.weight * 0.03);
+        const targetScale = hovered ? 1.35 : pulse;
+
+        ref.current.scale.lerp(new THREE.Vector3(targetScale, targetScale, targetScale), 0.1);
     });
 
     return (
-        <group ref ={ref} position = {position}>
+        <group
+            ref={ref}
+            position={position}
+            onPointerOver={() => setHovered(true)}
+            onPointerOut={() => setHovered(false)}
+        >
             <Text
-            fontSize = {fontSize}
-            color = {color}
-            anchorX = "center"
-            anchorY = "middle"
-            fillOpacity = { hovered ? 1 : baseOpacity}
-            onPointerOver = {() => setHovered(true)}
-            onPointerOut = {() => setHovered(false)}
+                fontSize={fontSize}
+                color={hovered ? "#fff" : color}
+                anchorX="center"
+                anchorY="middle"
+                fillOpacity={hovered ? 1 : baseOpacity}
+                font="https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfMZhrib2Bg-4.ttf"
             >
                 {word.word}
             </Text>
