@@ -48,26 +48,32 @@ def _extract_page_info(html: str) -> dict | None:
 
 def _try_newspaper(url: str) -> dict | None:
     try:
-        from newspaper import Article  # type: ignore
-        art = Article(url, request_timeout=15)
+        from newspaper import Article, Config # type: ignore
+        config = Config()
+        config.browser_user_agent = _BROWSER_HEADERS["User-Agent"]
+        config.request_timeout = 15
+        
+        art = Article(url, config=config)
         art.download()
         art.parse()
-        text = art.text.strip()
-        if len(text) > 300:
-            return {"text": text, "title": art.title}
-    except Exception:
-        pass
+        if len(art.text) > 200:
+            return {"text": art.text, "title": art.title}
+    except Exception as e:
+        logger.debug(f"Newspaper3k failed: {e}")
     return None
 
 def _try_requests(url: str) -> dict | None:
     try:
-        with httpx.Client(headers=_BROWSER_HEADERS, follow_redirects=True, verify=False, timeout=20) as client:
+        with httpx.Client(headers=_BROWSER_HEADERS, follow_redirects=True, timeout=15, verify=False) as client:
             resp = client.get(url)
-            resp.raise_for_status()
-            return _extract_page_info(resp.text)
-    except Exception:
-        pass
+            if resp.status_code == 200:
+                result = _extract_page_info(resp.text)
+                if result:
+                    return result
+    except Exception as e:
+        logger.debug(f"Requests fallback failed: {e}")
     return None
+
 
 def fetch_article_data(url: str) -> dict:
     strategies = [_try_newspaper, _try_requests]

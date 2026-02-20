@@ -24,12 +24,13 @@ export default function UrlInput({ onSubmit, isLoading }: UrlInputProps) {
         <header className="nav-header">
             <div className="nav-content">
                 <div className="brand-section">
-                    <h1 className="brand-title">3D Word Explorer</h1>
+                    <h1 className="brand-title">3D Word Cloud</h1>
                     <p className="brand-subtitle">Visualize the central topics of any article</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="input-group">
                     <input
+                        id="article-url-input"
                         type="url"
                         value={url}
                         onChange={(e) => setUrl(e.target.value)}
@@ -37,8 +38,10 @@ export default function UrlInput({ onSubmit, isLoading }: UrlInputProps) {
                         required
                         className="main-input"
                         disabled={isLoading}
+                        aria-label="Article URL"
                     />
                     <button
+                        id="analyze-submit-button"
                         type="submit"
                         disabled={isLoading || !url.trim()}
                         className="analyze-button"
@@ -51,6 +54,7 @@ export default function UrlInput({ onSubmit, isLoading }: UrlInputProps) {
                     <span className="sample-tag">Try a sample:</span>
                     {SAMPLE_URLS.map((sample, i) => (
                         <button
+                            id={`sample-chip-${i}`}
                             key={i}
                             type="button"
                             onClick={() => setUrl(sample.url)}

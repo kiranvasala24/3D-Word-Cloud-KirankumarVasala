@@ -1,26 +1,39 @@
 @echo off
 setlocal
 
-echo [1/3] Setting up Backend Virtual Environment...
+:: --- 3D Word Cloud : One-Click Setup for Windows ---
+
+:: 1. Setup Backend
+echo Setting up backend...
 cd backend
-if not exist venv (
-    python -m venv venv
+
+:: Detect Python command
+set PYTHON_CMD=python
+python --version >nul 2>&1
+if errorlevel 1 (
+    set PYTHON_CMD=python3
 )
+
+:: Create virtual environment if it doesn't already exist
+if not exist venv (
+    %PYTHON_CMD% -m venv venv
+)
+:: Activate the environment and install dependencies
 call venv\Scripts\activate
 pip install -r requirements.txt
-python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('punkt_tab')"
+:: Download NLTK datasets for text processing
+%PYTHON_CMD% -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('punkt_tab')"
 cd ..
 
-echo [2/3] Installing Frontend Dependencies...
+:: 2. Setup Frontend
+echo Installing frontend dependencies...
 cd frontend
+:: Install all npm packages from package.json
 call npm install
 cd ..
 
-echo [3/3] Starting Servers...
-echo Backend will be at http://localhost:8000
-echo Frontend will be at http://localhost:5173
-echo.
-echo CTRL+C to stop servers
-echo.
+:: 3. Finish and Launch
+echo Launching application...
+:: Starts both the FastAPI server and Vite dev server simultaneously
+npx concurrently --names "BACKEND,FRONTEND" --prefix_colors "magenta,cyan" "cd backend && venv\Scripts\uvicorn main:app --reload" "cd frontend && npm run dev"
 
-npx concurrently "cd backend && venv\Scripts\uvicorn main:app --reload" "cd frontend && npm run dev"
