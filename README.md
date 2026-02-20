@@ -2,94 +2,94 @@
 
 An interactive way to visualize and explore the key topics from any article as a dynamic 3D word cloud.
 
-## Stack
+## 🛠️ Tech Stack
 
-**Frontend:** React + TypeScript + React Three Fiber (Three.js) + Vite
-**Backend:** Python + FastAPI + BeautifulSoup + scikit-learn (TF-IDF)
-
-## How It Works
-
-1. User pastes a news article URL into the input field
-2. The frontend sends a `POST /analyze` request to the backend
-3. The backend fetches and cleans the article text using BeautifulSoup
-4. Keywords are extracted using TF-IDF with NLTK stopword filtering
-5. The frontend renders the results as an interactive 3D word cloud using React Three Fiber
-
-## 🚀 Getting Started
-
-Follow the instructions for your operating system to set up the **3D Word Cloud** explorer.
-
-### Prerequisites
-
-Before you begin, ensure you have the following installed:
-- **Python 3.8+** (Confirm with `python --version` or `python3 --version`)
-- **Node.js 18+** (Confirm with `node -v`)
-- **npm** (usually comes with Node.js)
+-   **Frontend:** React, TypeScript, Three.js (via React Three Fiber), Vite.
+-   **Backend:** Python 3, FastAPI, BeautifulSoup4, scikit-learn (TF-IDF), NLTK.
 
 ---
 
-### 🍎 macOS & 🐧 Linux Setup
+## 📋 Prerequisites
 
-1. **Open your Terminal** and navigate to the project's root folder.
-2. **Grant execution permissions** to the setup script:
-   ```bash
-   chmod +x setup.sh
-   ```
-3. **Run the installer**:
-   ```bash
-   ./setup.sh
-   ```
-   *This will automatically configure your Python virtual environment, install all dependencies, and launch the application.*
+Before you start, make sure you have the following installed on your system:
+
+| Tool | version | Download Link |
+| :--- | :--- | :--- |
+| **Python** | 3.8+ | [python.org](https://www.python.org/downloads/) |
+| **Node.js** | 18+ | [nodejs.org](https://nodejs.org/) |
+| **npm** | (with Node) | Included with Node.js |
 
 ---
 
-### 🪟 Windows Setup
+## 🚀 Installation Guide
 
-1. **Open your Terminal** (PowerShell or Command Prompt) and navigate to the project's root folder.
-2. **Run the setup batch file**:
-   ```cmd
-   setup.bat
-   ```
-   *The script will detect your Python installation, set up the environment, and start both the backend and frontend servers.*
+### 🪟 Windows (Recommended)
+1.  **Download/Clone** this repository to your computer.
+2.  **Open the folder** in File Explorer.
+3.  **Double-click `setup.bat`**.
+    *   The script will check your environment, install dependencies, and launch the app automatically.
+    *   *Note: If Windows warns about a batch file, click "More Info" -> "Run Anyway".*
+
+### 🍎 macOS & 🐧 Linux
+1.  **Open your Terminal** and navigate to the project root.
+2.  **Make the script executable**:
+    ```bash
+    chmod +x setup.sh
+    ```
+3.  **Run the script**:
+    ```bash
+    ./setup.sh
+    ```
+    *This will handle virtual environment creation, pip installs, and npm dependencies.*
 
 ---
 
-## 🌐 Accessing the App
+## ⚙️ Manual Installation (Optional)
 
-Once the setup is complete, your servers will be running at:
-- **Frontend Dashboard:** [http://localhost:5173](http://localhost:5173)
-- **Backend API:** [http://localhost:8000](http://localhost:8000)
+If you prefer to set up the project manually, follow these steps:
 
-## 🛠️ Troubleshooting
+### 1. Backend Setup
+```bash
+cd backend
+python -m venv venv
+# Windows:
+venv\Scripts\activate
+# macOS/Linux:
+source venv/bin/activate
 
-- **Python Errors:** If the script fails to find Python, ensure it is added to your system's PATH.
-- **Port Conflicts:** If ports 8000 or 5173 are already in use, the servers may fail to start. Close any applications using these ports and try again.
-- **NLTK Downloads:** The script attempts to download text-processing data. If you are behind a strict firewall, you may need to download these manually.
-
-## API
-
-### `POST /analyze`
-```json
-// Request
-{ "url": "https://example.com/article" }
-
-// Response
-{
-  "words": [{ "word": "climate", "weight": 1.0 }, ...],
-  "article_url": "https://example.com/article"
-}
+pip install -r requirements.txt
+python -c "import nltk; nltk.download('stopwords'); nltk.download('punkt'); nltk.download('punkt_tab')"
+uvicorn main:app --reload
 ```
 
-## Usage Guide
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-1. **Launch**: Run the appropriate setup script for your OS (instructions above).
-2. **Input**: Paste a link to any online article (news, Wikipedia, blog post).
-3. **Explore**: 
-   - **Rotate**: Left-click and drag anywhere on the sphere to rotate it.
-   - **Zoom**: Use your mouse wheel or pinch-to-zoom to get a closer look at the words.
-   - **Interact**: Hover over any word to see it glow and enlarge. This highlights the word's importance (weight) in the article.
+---
 
-## Notes
-- **Relevance**: Larger and more opaque words have a higher "weight," meaning they are more central to the article's topic.
-- **Natural Language**: The engine automatically filters out common words (like "the", "and") and focuses on unique keywords and phrases.
-- **Bigrams**: You will often see two-word pairs (e.g., "Artificial Intelligence") which provide more context than single words alone.
+## 🎮 How to Use
+
+1.  **Launch the App**: Access the dashboard at [http://localhost:5173](http://localhost:5173).
+2.  **Analyze an Article**: Paste a URL (e.g., a news story or Wikipedia page) into the input field and hit **Generate**.
+3.  **Interact with the Cloud**:
+    *   **Rotate**: Left-click and drag to spin the 3D sphere.
+    *   **Zoom**: Use the mouse wheel to move closer or further away.
+    *   **Explore**: Hover over words to see them highlight. Larger words represent more frequent or significant topics.
+
+---
+
+## ❓ Troubleshooting
+
+-   **Python not found**: Ensure Python is added to your system's "PATH" environment variable.
+-   **Port in use**: If port 8000 or 5173 is occupied, the app won't start. Close the conflicting app or restart your terminal.
+-   **NLTK Timeout**: If the NLTK download fails, check your internet connection or firewall settings.
+
+---
+
+## 📄 License & Notes
+*   **Keywords**: The engine uses TF-IDF to find the most unique and relevant words, ignoring common "stop words" like *the, a, is*.
+*   **Performance**: The 3D view is GPU-accelerated for smooth 60fps performance even with many words.
